@@ -26,6 +26,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.cloud.contract.spec.ContractDsl.Companion.contract
 import org.springframework.cloud.contract.spec.internal.Cookie
 import org.springframework.cloud.contract.spec.internal.DslProperty
+import org.springframework.cloud.contract.spec.internal.ExecutionProperty
 import org.springframework.cloud.contract.spec.internal.FromFileProperty
 import org.springframework.cloud.contract.spec.internal.KotlinContractConverter
 import org.springframework.cloud.contract.spec.internal.MatchingType
@@ -801,6 +802,47 @@ then:
 			assertThat(((namedProperty.value as DslProperty<Any>).serverValue as FromFileProperty).fileName()).isEqualTo("test.json")
 			assertThat((namedProperty.contentType as DslProperty<Any>).clientValue).isEqualTo("application/json")
 			assertThat((namedProperty.contentType as DslProperty<Any>).serverValue).isEqualTo("application/json")
+		}
+	}
+
+	@Test  // Issue #1447
+	fun `should work with execute in body`() {
+		val contract = contract {
+			request {
+				url = url("/test")
+				method = POST
+				body = body(
+						mapOf(
+								"ConstructionYear" to value(producer(execute("getYear(2)")), consumer("2018"))
+						)
+				)
+			}
+			response {
+				status = CREATED
+				body = body(mapOf(
+						"ConstructionYear" to fromRequest().body("$.ConstructionYear")
+				))
+			}
+		}
+
+		assertDoesNotThrow {
+			Contract.assertContract(contract)
+		}.also {
+			val request = contract.request
+			assertThat(request.body).isNotNull()
+			assertThat(request.body.clientValue).isNotNull()
+			assertThat(request.body.clientValue).isInstanceOf(LinkedHashMap::class.java)
+			val body = request.body.clientValue as LinkedHashMap<String, Any>
+			assertThat(body).hasSize(1)
+			assertThat(body.keys).containsExactly("ConstructionYear")
+			var constructionYear: DslProperty<Any>
+
+			assertThat(body["ConstructionYear"]).isInstanceOf(DslProperty::class.java)
+			constructionYear = body["ConstructionYear"] as DslProperty<Any>
+			assertThat(constructionYear.clientValue).isEqualTo("2018")
+			assertThat(constructionYear.serverValue).isInstanceOf(ExecutionProperty::class.java)
+			var executionProperty = constructionYear.serverValue as ExecutionProperty
+			assertThat(executionProperty.executionCommand).isEqualTo("getYear(2)")
 		}
 	}
 
