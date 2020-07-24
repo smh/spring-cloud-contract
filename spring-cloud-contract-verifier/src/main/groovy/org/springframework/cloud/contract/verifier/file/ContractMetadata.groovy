@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory
 
 import org.springframework.cloud.contract.spec.Contract
 import org.springframework.cloud.contract.spec.internal.DslProperty
+import org.springframework.cloud.contract.spec.internal.FromFileProperty
 import org.springframework.cloud.contract.spec.internal.Header
 import org.springframework.cloud.contract.spec.internal.Headers
 import org.springframework.cloud.contract.verifier.util.ContentType
@@ -89,6 +90,26 @@ class ContractMetadata {
 
 	boolean anyInProgress() {
 		return this.convertedContract.any { it.inProgress }
+	}
+
+	boolean anyPayloadFromFile() {
+		return this.convertedContract.any {
+			if (it.request != null && it.request.body != null) {
+				return isFromFileProperty(it.request.body)
+			} else if (it.request != null && it.request.multipart != null) {
+				return it.request.multipart.
+			} else if (it.response != null && it.response.body != null) {
+				return isFromFileProperty(it.response.body)
+			} else if (it.input != null && it.input.messageBody != null) {
+				return isFromFileProperty(it.input.messageBody)
+			} else if (it.outputMessage != null && it.outputMessage.body != null) {
+				return isFromFileProperty(it.outputMessage.body)
+			}
+		}
+	}
+
+	private boolean isFromFileProperty(DslProperty value) {
+		return value.clientValue instanceof FromFileProperty || value.serverValue instanceof FromFileProperty
 	}
 }
 
@@ -203,6 +224,10 @@ class SingleContractMetadata {
 
 	boolean isMessaging() {
 		return !isHttp()
+	}
+
+	boolean anyPayloadFromFile() {
+		return this.contractMetadata.anyPayloadFromFile()
 	}
 
 	private DslProperty inputBody(Contract contract) {

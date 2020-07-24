@@ -81,4 +81,9 @@ class GeneratedClassMetaData {
 				.anyMatch(SingleContractMetadata::isMessaging);
 	}
 
+	boolean isAnyPayloadFromFile() {
+		return toSingleContractMetadata().stream()
+				.anyMatch(SingleContractMetadata::anyPayloadFromFile);
+	}
+
 }

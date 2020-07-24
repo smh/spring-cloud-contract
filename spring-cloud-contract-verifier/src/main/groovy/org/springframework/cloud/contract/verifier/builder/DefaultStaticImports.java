@@ -16,24 +16,28 @@
 
 package org.springframework.cloud.contract.verifier.builder;
 
-import java.util.Arrays;
-
 class DefaultStaticImports implements Imports {
 
 	private final BlockBuilder blockBuilder;
 
-	private static final String[] IMPORTS = {
-			"org.springframework.cloud.contract.verifier.assertion.SpringCloudContractAssertions.assertThat",
-			"org.springframework.cloud.contract.verifier.util.ContractVerifierUtil.*" };
+	private final GeneratedClassMetaData generatedClassMetaData;
 
-	DefaultStaticImports(BlockBuilder blockBuilder) {
+	DefaultStaticImports(BlockBuilder blockBuilder,
+			GeneratedClassMetaData generatedClassMetaData) {
 		this.blockBuilder = blockBuilder;
+		this.generatedClassMetaData = generatedClassMetaData;
 	}
 
 	@Override
 	public Imports call() {
-		Arrays.stream(IMPORTS)
-				.forEach(s -> this.blockBuilder.addLineWithEnding("import static " + s));
+		this.blockBuilder.addLineWithEnding(
+				"import static org.springframework.cloud.contract.verifier.assertion.SpringCloudContractAssertions.assertThat");
+		if (this.generatedClassMetaData.isAnyXml()
+				|| this.generatedClassMetaData.isAnyMessaging()
+				|| this.generatedClassMetaData.isAnyPayloadFromFile()) {
+			this.blockBuilder.addLineWithEnding(
+					"import static org.springframework.cloud.contract.verifier.util.ContractVerifierUtil.*");
+		}
 		return this;
 	}
 

@@ -926,7 +926,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
 import static org.springframework.cloud.contract.verifier.assertion.SpringCloudContractAssertions.assertThat;
-import static org.springframework.cloud.contract.verifier.util.ContractVerifierUtil.*;
 import static com.toomuchcoding.jsonassert.JsonAssertion.assertThatJson;
 import static javax.ws.rs.client.Entity.*;
 

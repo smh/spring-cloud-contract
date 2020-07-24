@@ -32,7 +32,7 @@ class ImportsBuilder {
 
 	ImportsBuilder defaultImports() {
 		this.parentBuilder.imports(new DefaultImports(builder, metaData));
-		this.parentBuilder.staticImports(new DefaultStaticImports(builder));
+		this.parentBuilder.staticImports(new DefaultStaticImports(builder, metaData));
 		return this;
 	}
 

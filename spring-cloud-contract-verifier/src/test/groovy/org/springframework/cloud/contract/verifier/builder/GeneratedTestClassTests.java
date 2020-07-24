@@ -78,7 +78,6 @@ public class GeneratedTestClassTests {
 + "import io.restassured.response.ResponseOptions;\n"
 + "\n"
 + "import static org.springframework.cloud.contract.verifier.assertion.SpringCloudContractAssertions.assertThat;\n"
-+ "import static org.springframework.cloud.contract.verifier.util.ContractVerifierUtil.*;\n"
 + "import static com.toomuchcoding.jsonassert.JsonAssertion.assertThatJson;\n"
 + "import static io.restassured.module.mockmvc.RestAssuredMockMvc.*;\n"
 + "\n"
