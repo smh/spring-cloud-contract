@@ -28,9 +28,9 @@ import org.apache.camel.support.DefaultExchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.contract.verifier.converter.YamlContract;
 import org.springframework.cloud.contract.verifier.messaging.MessageVerifier;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Marcin Grzejszczak
@@ -43,7 +43,6 @@ public class CamelStubMessages implements MessageVerifier<Message> {
 
 	private final ContractVerifierCamelMessageBuilder builder;
 
-	@Autowired
 	public CamelStubMessages(CamelContext context) {
 		this.context = context;
 		this.builder = new ContractVerifierCamelMessageBuilder(context);
@@ -52,16 +51,29 @@ public class CamelStubMessages implements MessageVerifier<Message> {
 	@Override
 	public void send(Message message, String destination, YamlContract contract) {
 		try {
+			StandaloneMetadata metadata = StandaloneMetadata
+					.fromMetadata(contract.metadata);
 			ProducerTemplate producerTemplate = this.context.createProducerTemplate();
 			Exchange exchange = new DefaultExchange(this.context);
 			exchange.setIn(message);
-			producerTemplate.send(destination, exchange);
+			String finalDestination = finalDestination(destination,
+					metadata.getInput().getAdditionalOptions(), metadata);
+			producerTemplate.send(finalDestination, exchange);
 		}
 		catch (Exception e) {
 			log.error("Exception occurred while trying to send a message [" + message
 					+ "] " + "to a channel with name [" + destination + "]", e);
 			throw e;
 		}
+	}
+
+	public String finalDestination(String destination, String additionalOpts,
+			StandaloneMetadata metadata) {
+		String finalDestination = destination;
+		if (StringUtils.hasText(additionalOpts)) {
+			finalDestination = finalDestination + "?" + additionalOpts;
+		}
+		return finalDestination;
 	}
 
 	@Override
@@ -75,7 +87,11 @@ public class CamelStubMessages implements MessageVerifier<Message> {
 			YamlContract contract) {
 		try {
 			ConsumerTemplate consumerTemplate = this.context.createConsumerTemplate();
-			Exchange exchange = consumerTemplate.receive(destination,
+			StandaloneMetadata metadata = StandaloneMetadata
+					.fromMetadata(contract.metadata);
+			String finalDestination = finalDestination(destination,
+					metadata.getOutputMessage().getAdditionalOptions(), metadata);
+			Exchange exchange = consumerTemplate.receive(finalDestination,
 					timeUnit.toMillis(timeout));
 			return exchange != null ? exchange.getIn() : null;
 		}

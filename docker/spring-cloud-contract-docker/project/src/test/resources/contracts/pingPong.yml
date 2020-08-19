@@ -1,0 +1,12 @@
+description: 'Send a pong message in response to a ping message'
+label: 'ping_pong'
+input:
+  triggeredBy: 'triggerMessage("ping_pong")'
+outputMessage:
+  sentTo: 'rabbitmq:output'
+  body:
+    message: 'pong'
+metadata:
+  standalone:
+    outputMessage:
+      additionalOptions: addresses=172.18.0.1:5672&queue=output
