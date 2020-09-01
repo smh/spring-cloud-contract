@@ -24,15 +24,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-compiler-embeddable</artifactId>
+			<artifactId>kotlin-scripting-jsr223</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-scripting-compiler-embeddable</artifactId>
+			<artifactId>kotlin-script-runtime</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-script-util</artifactId>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -52,7 +52,7 @@
 			<plugin>
 				<!-- Based on instructions here - https://kotlinlang.org/docs/reference/using-maven.html -->
 				<artifactId>kotlin-maven-plugin</artifactId>
-				<version>${contract.kotlin.version}</version>
+				<version>${contract-kotlin.version}</version>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<configuration>
 					<jvmTarget>1.8</jvmTarget>
