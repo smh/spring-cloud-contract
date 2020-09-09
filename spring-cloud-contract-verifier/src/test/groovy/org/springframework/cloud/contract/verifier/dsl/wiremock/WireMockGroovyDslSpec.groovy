@@ -2961,6 +2961,30 @@ class WireMockGroovyDslSpec extends Specification implements WireMockStubVerifie
 			stubMappingIsValidWireMockStub(wireMockStub)
 	}
 
+	def "should work with ignoring whitespace"() {
+		given:
+			Contract contractDsl = Contract.make {
+				request {
+					method POST()
+					urlPath("/foo")
+					body('''{"query":"query queryName($personName: String!) {\\n  personToCheck(name: $personName) {\\n    name\\n    age\\n  }\\n}\\n\\n\\n\\n","variables":{"personName":"Old Enough"},"operationName":"queryName"}''')
+					bodyMatchers {
+						jsonPath('$.query', ignoringWhitespace())
+					}
+				}
+				response {
+					status OK()
+				}
+			}
+		when:
+			String wireMockStub = new WireMockStubStrategy("Test",
+					new ContractMetadata(null, false, 0, null, contractDsl), contractDsl)
+					.toWireMockClientStub()
+
+		then:
+			stubMappingIsValidWireMockStub(wireMockStub)
+	}
+
 	@Issue("#1257")
 	def "should work with null request element on the client side and optional stub entry"() {
 		given:

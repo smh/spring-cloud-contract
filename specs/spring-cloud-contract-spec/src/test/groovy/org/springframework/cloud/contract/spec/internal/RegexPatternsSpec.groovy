@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.contract.spec.internal
 
+import java.util.regex.Pattern
+
 import spock.lang.Specification
 
 class RegexPatternsSpec extends Specification {
@@ -366,5 +368,22 @@ class RegexPatternsSpec extends Specification {
 			'foo'       || true
 			'bar'       || true
 			'baz'       || false
+	}
+
+	def "should generate a whitespace ignoring regex for value [#textToMatch] that should be equal to pattern [#pattern]"() {
+		expect:
+			RegexPatterns.ignoringWhitespace().pattern(textToMatch) == pattern
+			Pattern.compile(pattern).matcher(textToMatch).matches()
+			if (textToMatch.contains(" ")) {
+				!Pattern.compile(pattern).matcher(textToMatch.replaceAll("\\s+", "_")).matches()
+			}
+		where:
+			textToMatch                                                                                                                 || pattern
+			'foo'                                                                                                                       || '^foo$'
+			'foo bar'                                                                                                                   || '^foo\\s+bar$'
+			'foo       bar'                                                                                                             || '^foo\\s+bar$'
+			'foo  \n\n\t\t    bar'                                                                                                      || '^foo\\s+bar$'
+			'foo  \n\n\t\t    bar \n buz \t biz'                                                                                        || '^foo\\s+bar\\s+buz\\s+biz$'
+			'query queryName($personName: String!) {\\n  personToCheck(name: $personName) {\\n    name\\n    age\\n  }\\n}\\n\\n\\n\\n' || '^query\\s+queryName\\(\\$personName:\\s+String!\\)\\s+\\{(\\\\n)?\\s+personToCheck\\(name:\\s+\\$personName\\)\\s+\\{(\\\\n)?\\s+name(\\\\n)?\\s+age(\\\\n)?\\s+\\}(\\\\n)?\\}(\\\\n)?(\\\\n)?(\\\\n)?(\\\\n)?$'
 	}
 }

@@ -30,7 +30,8 @@ public interface BodyMatcher {
 	MatchingType matchingType();
 
 	/**
-	 * @return Path to the path. Example for JSON it will be JSON Path.
+	 * @return Path to the path. Example for JSON it will be JSON Path. For the whole body
+	 * will be {@code null}.
 	 */
 	String path();
 

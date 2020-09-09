@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
  */
 public final class RegexpUtils {
 
+	private static final Pattern SPECIAL_REGEX_CHARS = Pattern
+			.compile("[{}()\\[\\].+*?^$\\\\|]");
+
 	private RegexpUtils() {
 		throw new IllegalStateException("Can't instantiate a utility class");
 	}
@@ -36,8 +39,5 @@ public final class RegexpUtils {
 	public static String escapeSpecialRegexWithSingleEscape(String str) {
 		return SPECIAL_REGEX_CHARS.matcher(str).replaceAll("\\\\$0");
 	}
-
-	private static final Pattern SPECIAL_REGEX_CHARS = Pattern
-			.compile("[{}()\\[\\].+*?^$\\\\|]");
 
 }

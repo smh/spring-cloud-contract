@@ -37,6 +37,11 @@ public class BodyMatchers {
 
 	protected final List<BodyMatcher> matchers = new LinkedList<>();
 
+	// TODO: Add whole body support
+	public void wholeBody(MatchingTypeValue matchingType) {
+		this.matchers.add(new WholeBodyMatcher(matchingType));
+	}
+
 	public void jsonPath(String path, MatchingTypeValue matchingType) {
 		this.matchers.add(new PathBodyMatcher(path, matchingType));
 	}
@@ -79,6 +84,11 @@ public class BodyMatchers {
 
 	public MatchingTypeValue byTimestamp() {
 		return new MatchingTypeValue(MatchingType.TIMESTAMP, RegexPatterns.isoDateTime());
+	}
+
+	public MatchingTypeValue ignoringWhitespace() {
+		return new MatchingTypeValue(MatchingType.REGEX,
+				RegexPatterns.ignoringWhitespace());
 	}
 
 	public RegexMatchingTypeValue byRegex(String regex) {

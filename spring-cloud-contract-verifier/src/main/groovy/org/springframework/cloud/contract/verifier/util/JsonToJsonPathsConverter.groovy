@@ -313,10 +313,26 @@ class JsonToJsonPathsConverter {
 			}
 			return result
 		}
-		else {
-			String convertedValue = value.toString().replace('/', '\\\\/')
-			return "${propertyName} =~ /(${convertedValue})/"
+		else if (value instanceof RegexProperty) {
+			Object convertedBody = body
+			Object retrievedValue = null
+			if (convertedBody != null) {
+				convertedBody = MapConverter.transformValues(body) {
+					return generatedValueIfNeeded(it)
+				}
+				retrievedValue = JsonPath.parse(convertedBody).
+						read(bodyMatcher.path())
+			}
+			return compare(value.pattern(retrievedValue?.toString()), propertyName)
 		}
+		else {
+			return compare(value.toString(), propertyName)
+		}
+	}
+
+	private static String compare(String value, String propertyName) {
+		String convertedValue = value.replace('/', '\\\\/')
+		return "${propertyName} =~ /(${convertedValue})/"
 	}
 
 	JsonPaths transformToJsonPathWithTestsSideValues(def json,

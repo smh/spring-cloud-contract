@@ -17,11 +17,14 @@
 package org.springframework.cloud.contract.spec.internal;
 
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.springframework.cloud.contract.spec.util.RegexpUtils;
 
 /**
  * Contains most common regular expression patterns.
@@ -193,6 +196,19 @@ public final class RegexPatterns {
 
 	public static RegexProperty nonBlank() {
 		return new RegexProperty(NON_BLANK).asString();
+	}
+
+	public static RegexProperty ignoringWhitespace() {
+		return new RegexProperty((Function<CharSequence, Pattern>) charSequence -> {
+			if (charSequence == null) {
+				return Pattern.compile("");
+			}
+			return Pattern.compile("^"
+					+ RegexpUtils
+							.escapeSpecialRegexWithSingleEscape(charSequence.toString())
+							.replace("\\\\n", "(\\\\n)?").replaceAll("\\s+", "[\\\\s|\\\\\\\\n|\\\\\\\\t]+")
+					+ "$");
+		}).asString();
 	}
 
 	// end::regexps[]

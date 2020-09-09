@@ -154,7 +154,7 @@ class WireMockRequestStubStrategy extends BaseWireMockStubStrategy {
 				String newPath = JsonToJsonPathsConverter.
 						convertJsonPathAndRegexToAJsonPath(it, originalBody)
 				requestPattern.withRequestBody(WireMock.
-						matchingJsonPath(newPath.replace("\\\\", "\\")))
+						matchingJsonPath(newPath))
 			}
 		}
 		else if (contentType == ContentType.XML) {

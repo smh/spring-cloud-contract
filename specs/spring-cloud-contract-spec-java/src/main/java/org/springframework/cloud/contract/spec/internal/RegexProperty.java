@@ -17,6 +17,7 @@
 package org.springframework.cloud.contract.spec.internal;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +31,7 @@ import repackaged.nl.flotsam.xeger.Xeger;
  */
 public class RegexProperty extends DslProperty implements CanBeDynamic {
 
-	final Pattern pattern;
+	final Function<CharSequence, Pattern> pattern;
 
 	private final Class clazz;
 
@@ -44,16 +45,14 @@ public class RegexProperty extends DslProperty implements CanBeDynamic {
 
 	public RegexProperty(Object client, Object server, Class clazz) {
 		super(client, server);
-		boolean clientDynamic = client instanceof Pattern
-				|| client instanceof RegexProperty;
-		boolean serverDynamic = server instanceof Pattern
-				|| server instanceof RegexProperty;
+		boolean clientDynamic = isDynamic(client);
+		boolean serverDynamic = isDynamic(server);
 		if (!clientDynamic && !serverDynamic) {
 			throw new IllegalStateException("Neither client not server side is dynamic");
 		}
 		Object dynamicValue = clientDynamic ? client : server;
 		if (dynamicValue instanceof Pattern) {
-			this.pattern = (Pattern) dynamicValue;
+			this.pattern = body -> (Pattern) dynamicValue;
 			this.clazz = clazz != null ? clazz : String.class;
 		}
 		else if (dynamicValue instanceof RegexProperty) {
@@ -61,18 +60,31 @@ public class RegexProperty extends DslProperty implements CanBeDynamic {
 			this.pattern = regexProperty.pattern;
 			this.clazz = clazz != null ? clazz : regexProperty.clazz;
 		}
+		else if (dynamicValue instanceof Function) {
+			this.pattern = (Function<CharSequence, Pattern>) dynamicValue;
+			this.clazz = clazz != null ? clazz : String.class;
+		}
 		else {
 			this.clazz = clazz;
-			this.pattern = null;
+			this.pattern = body -> null;
 		}
 	}
 
+	public boolean isDynamic(Object client) {
+		return client instanceof Pattern || client instanceof RegexProperty
+				|| client instanceof Function;
+	}
+
 	public Matcher matcher(CharSequence input) {
-		return this.pattern.matcher(input);
+		return this.pattern.apply(input).matcher(input);
 	}
 
 	public String pattern() {
-		return this.pattern.pattern();
+		return pattern(null);
+	}
+
+	public String pattern(CharSequence input) {
+		return this.pattern.apply(input).pattern();
 	}
 
 	public Class clazz() {
@@ -120,7 +132,7 @@ public class RegexProperty extends DslProperty implements CanBeDynamic {
 
 	private Object doGenerate(int retries) {
 		try {
-			String generatedValue = new Xeger(this.pattern.pattern()).generate();
+			String generatedValue = new Xeger(pattern()).generate();
 			if (Integer.class.equals(this.clazz)) {
 				return Integer.parseInt(generatedValue);
 			}
@@ -194,13 +206,14 @@ public class RegexProperty extends DslProperty implements CanBeDynamic {
 				&& Objects.equals(clazz, that.clazz);
 	}
 
-	private Object stringPatternIfPresent(Pattern value) {
-		return value != null ? value.pattern() : null;
+	private Object stringPatternIfPresent(Function<CharSequence, Pattern> value) {
+		return value != null
+				? value.apply(null) != null ? value.apply(null).pattern() : null : null;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(stringPatternIfPresent(pattern), clazz);
+		return Objects.hash(stringPatternIfPresent(this.pattern), this.clazz);
 	}
 
 	@Override
@@ -214,11 +227,15 @@ public class RegexProperty extends DslProperty implements CanBeDynamic {
 	}
 
 	public Pattern getPattern() {
-		return pattern;
+		return this.pattern.apply(null);
+	}
+
+	public Function<CharSequence, Pattern> getPatternFunction() {
+		return this.pattern;
 	}
 
 	public Class getClazz() {
-		return clazz;
+		return this.clazz;
 	}
 
 }

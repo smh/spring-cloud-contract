@@ -34,17 +34,6 @@ public class RegexMatchingTypeValue extends MatchingTypeValue {
 		return typed(Integer.class);
 	}
 
-	private RegexMatchingTypeValue typed(Class clazz) {
-		if (!(this.getValue() instanceof RegexProperty)) {
-			throw new IllegalStateException("Value has to be a regex");
-		}
-		RegexProperty regexProperty = (RegexProperty) this.getValue();
-		return new RegexMatchingTypeValue(this.getType(),
-				new RegexProperty(regexProperty.getClientValue(),
-						regexProperty.getServerValue(), clazz),
-				this.getMinTypeOccurrence(), this.getMaxTypeOccurrence());
-	}
-
 	public RegexMatchingTypeValue asDouble() {
 		return typed(Double.class);
 	}
@@ -67,6 +56,17 @@ public class RegexMatchingTypeValue extends MatchingTypeValue {
 
 	public RegexMatchingTypeValue asBooleanType() {
 		return typed(Boolean.class);
+	}
+
+	private RegexMatchingTypeValue typed(Class clazz) {
+		if (!(this.getValue() instanceof RegexProperty)) {
+			throw new IllegalStateException("Value has to be a regex");
+		}
+		RegexProperty regexProperty = (RegexProperty) this.getValue();
+		return new RegexMatchingTypeValue(this.getType(),
+				new RegexProperty(regexProperty.getClientValue(),
+						regexProperty.getServerValue(), clazz),
+				this.getMinTypeOccurrence(), this.getMaxTypeOccurrence());
 	}
 
 }
