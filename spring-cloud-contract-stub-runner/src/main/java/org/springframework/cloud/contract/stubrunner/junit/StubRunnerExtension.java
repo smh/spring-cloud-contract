@@ -135,6 +135,7 @@ public class StubRunnerExtension implements BeforeAllCallback, AfterAllCallback,
 		}
 	}
 
+
 	@Override
 	public URL findStubUrl(String groupId, String artifactId)
 			throws StubNotFoundException {
