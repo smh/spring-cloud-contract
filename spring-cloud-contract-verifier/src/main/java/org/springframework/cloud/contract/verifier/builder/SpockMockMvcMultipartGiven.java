@@ -25,7 +25,7 @@ import org.springframework.cloud.contract.verifier.file.SingleContractMetadata;
 import org.springframework.cloud.contract.verifier.util.ContentUtils;
 import org.springframework.cloud.contract.verifier.util.MapConverter;
 
-class SpockMockMvcMultipartGiven implements Given {
+class SpockMockMvcMultipartGiven implements Given, MockMvcAcceptor {
 
 	private final BlockBuilder blockBuilder;
 
@@ -84,6 +84,7 @@ class SpockMockMvcMultipartGiven implements Given {
 	public boolean accept(SingleContractMetadata metadata) {
 		Request request = metadata.getContract().getRequest();
 		return request != null && request.getMultipart() != null
+				&& acceptType(this.generatedClassMetaData, metadata)
 				&& this.generatedClassMetaData.configProperties
 						.getTestFramework() == TestFramework.SPOCK;
 	}

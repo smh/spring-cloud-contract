@@ -26,13 +26,13 @@ import org.springframework.cloud.contract.spec.internal.Response;
 import org.springframework.cloud.contract.verifier.file.SingleContractMetadata;
 import org.springframework.cloud.contract.verifier.util.MapConverter;
 
-class RestAssuredHeadersThen implements Then, RestAssuredAcceptor {
+class CustomModeHeadersThen implements Then, CustomModeAcceptor {
 
 	private final BlockBuilder blockBuilder;
 
 	private final ComparisonBuilder comparisonBuilder;
 
-	RestAssuredHeadersThen(BlockBuilder blockBuilder,
+	CustomModeHeadersThen(BlockBuilder blockBuilder,
 			ComparisonBuilder comparisonBuilder) {
 		this.blockBuilder = blockBuilder;
 		this.comparisonBuilder = comparisonBuilder;

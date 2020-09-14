@@ -69,7 +69,8 @@ public class JavaTestGenerator implements SingleTestGenerator {
 						.build()
 					.imports()
 						.defaultImports()
-						.custom()
+						.userImports()
+						.customMode()
 						.json()
 						.jUnit4()
 						.jUnit5()
@@ -96,6 +97,7 @@ public class JavaTestGenerator implements SingleTestGenerator {
 		return ClassBodyBuilder.builder(builder, metaData)
 				.field()
 					.messaging()
+					.customMode()
 					.build()
 				.methodBuilder(methodBuilder);
 		// @formatter:on
@@ -116,6 +118,7 @@ public class JavaTestGenerator implements SingleTestGenerator {
 					.spock()
 					.build()
 				.restAssured()
+				.customMode()
 				.jaxRs()
 				.messaging();
 		// @formatter:on

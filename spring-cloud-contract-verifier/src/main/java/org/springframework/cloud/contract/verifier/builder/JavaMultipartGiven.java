@@ -26,7 +26,7 @@ import org.springframework.cloud.contract.verifier.util.MapConverter;
 
 import static org.springframework.cloud.contract.verifier.util.ContentUtils.getJavaMultipartFileParameterContent;
 
-class MockMvcMultipartGiven implements Given {
+class JavaMultipartGiven implements Given, RestAssuredAcceptor {
 
 	private final BlockBuilder blockBuilder;
 
@@ -36,7 +36,7 @@ class MockMvcMultipartGiven implements Given {
 
 	private final BodyParser bodyParser;
 
-	MockMvcMultipartGiven(BlockBuilder blockBuilder,
+	JavaMultipartGiven(BlockBuilder blockBuilder,
 			GeneratedClassMetaData generatedClassMetaData, BodyParser bodyParser) {
 		this.blockBuilder = blockBuilder;
 		this.bodyReader = new BodyReader(generatedClassMetaData);
@@ -84,6 +84,7 @@ class MockMvcMultipartGiven implements Given {
 	public boolean accept(SingleContractMetadata metadata) {
 		Request request = metadata.getContract().getRequest();
 		return request != null && request.getMultipart() != null
+				&& acceptType(this.generatedClassMetaData, metadata)
 				&& this.generatedClassMetaData.configProperties
 						.getTestFramework() != TestFramework.SPOCK;
 	}
